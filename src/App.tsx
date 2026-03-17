@@ -1,0 +1,22 @@
+import { Button } from "@/components/ui/button";
+
+function App() {
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50">
+      <div className="text-center space-y-4">
+        <h1 className="text-4xl font-bold text-slate-900">
+          FindMeADoc
+        </h1>
+        <p className="text-lg text-slate-600">
+          Patient & Doctor Appointment System
+        </p>
+
+        <Button onClick={() => alert("Shadcn is working perfectly!")}>
+          Book an Appointment
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+export default App;
