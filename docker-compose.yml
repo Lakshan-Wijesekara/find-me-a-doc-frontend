@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  frontend-app:
+    build: .
+    container_name: findmeadoc_frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules # Prevents local node_modules from overwriting the container's
+    restart: unless-stopped
