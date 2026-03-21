@@ -11,7 +11,7 @@ function App() {
           Patient & Doctor Appointment System
         </p>
 
-        <Button onClick={() => alert("Shadcn is working perfectly!")}>
+        <Button onClick={() => alert("Booked test!")}>
           Book an Appointment
         </Button>
       </div>
