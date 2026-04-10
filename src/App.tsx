@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import Marketplace from '@/pages/Marketplace';
 
 function App() {
   return (
@@ -14,6 +15,9 @@ function App() {
         <Button onClick={() => alert("Booked test!")}>
           Book an Appointment
         </Button>
+        <div>
+          < Marketplace />
+        </div>
       </div>
     </div>
   );
