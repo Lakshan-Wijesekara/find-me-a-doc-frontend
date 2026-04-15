@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
 import Marketplace from '@/pages/Marketplace';
+import PatientDashboard from "@/components/PatientDashboard.tsx";
+import './App.css';
 
 function App() {
   return (
@@ -17,6 +19,9 @@ function App() {
         </Button>
         <div>
           < Marketplace />
+        </div>
+        <div>
+          <  PatientDashboard/>
         </div>
       </div>
     </div>
