@@ -12,7 +12,6 @@ function PatientDashboard() {
                 const data = await getPatientAppointments();
                 setAppointments(data);
             } catch (err: any) {
-                // Ignore 403s if testing without login, otherwise show error
                 setError("Failed to load appointments. Please ensure you are logged in.");
             } finally {
                 setIsLoading(false);
