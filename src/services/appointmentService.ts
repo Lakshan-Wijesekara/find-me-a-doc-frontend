@@ -23,6 +23,11 @@ export interface AppointmentDashboardResponse {
     status: string;
 }
 
+export interface AvailableSlotResponse {
+    startTime: string; // Format: "HH:mm:ss"
+    endTime: string;   // Format: "HH:mm:ss"
+}
+
 const API_BASE_URL = "http://localhost:8080/api/v1/appointments";
 
 // Create the function to send the booking request
@@ -59,4 +64,23 @@ export const getPatientAppointments = async(): Promise<AppointmentDashboardRespo
         }
     );
     return response.data
+}
+
+//Fetch the dynamic slots for a specific doctor and date
+export const getAvailableSlots = async(doctorId: number, date: string): Promise<AvailableSlotResponse[]> => {
+    const token = localStorage.getItem("token");
+
+    const response = await axios.get<AvailableSlotResponse[]>(
+        `${API_BASE_URL}/available-slots`,
+        {
+            params: {
+                doctorId: doctorId,
+                date: date
+            },
+            headers: {
+                "Authorization": `Bearer ${token}`,
+            }
+        }
+    );
+    return response.data;
 }
