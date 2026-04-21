@@ -2,6 +2,9 @@ import { Button } from "@/components/ui/button";
 import Marketplace from '@/pages/Marketplace';
 import PatientDashboard from "@/components/PatientDashboard.tsx";
 import './App.css';
+import {LoginPage} from "@/pages/LoginPage.tsx";
+import {DoctorRegisterPage} from "@/pages/DoctorRegisterPage.tsx";
+import {PatientRegisterPage} from "@/pages/PatientRegisterPage.tsx";
 
 function App() {
   return (
@@ -22,6 +25,13 @@ function App() {
         </div>
         <div>
           <  PatientDashboard/>
+        </div>
+        <div>
+          <  LoginPage/>
+        </div>
+        <div>
+          <  DoctorRegisterPage/>
+          < PatientRegisterPage />
         </div>
       </div>
     </div>
