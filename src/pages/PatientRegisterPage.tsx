@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import { registerPatient } from '@/services/authService';
+import { useNavigate } from 'react-router-dom';
 
 export const PatientRegisterPage = () => {
+    const navigate = useNavigate();
+
+    // 1. Form States
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
-
-    // UI Status States
+    const [age, setAge] = useState('');
+    // 2. UI Status States
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
@@ -15,7 +19,8 @@ export const PatientRegisterPage = () => {
     const handleRegister = async (e: React.SyntheticEvent) => {
         e.preventDefault();
 
-        if (!name || !email || !password || !phoneNumber) {
+        // Basic validation updated
+        if (!name || !email || !password || !phoneNumber || !age) {
             setErrorMessage("Please fill in all fields.");
             return;
         }
@@ -29,7 +34,8 @@ export const PatientRegisterPage = () => {
                 name,
                 email,
                 password,
-                phoneNumber
+                phoneNumber,
+                age: parseInt(age, 10) // Convert the string input to a number
             });
 
             setSuccessMessage(`Welcome ${response.name}! Your patient account has been created successfully. You can now log in.`);
@@ -39,6 +45,7 @@ export const PatientRegisterPage = () => {
             setEmail('');
             setPassword('');
             setPhoneNumber('');
+            setAge('');
 
         } catch (error: any) {
             setErrorMessage(
@@ -53,6 +60,7 @@ export const PatientRegisterPage = () => {
         <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4 py-10">
             <div className="w-full max-w-sm rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
 
+                {/* LOGO SECTION */}
                 <div className="mb-6 flex flex-col items-center justify-center gap-2">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary shadow-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-primary-foreground">
@@ -95,9 +103,17 @@ export const PatientRegisterPage = () => {
                         <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="patient@example.com" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" />
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">Phone Number</label>
-                        <input type="tel" required value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} placeholder="+1 234 567 890" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" />
+                    {/* SIDE-BY-SIDE GRID FOR PHONE AND AGE */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-foreground">Phone</label>
+                            <input type="tel" required value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} placeholder="+1 234 5678" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-foreground">Age</label>
+                            <input type="number" required min="0" max="120" value={age} onChange={(e) => setAge(e.target.value)} placeholder="25" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" />
+                        </div>
                     </div>
 
                     <div className="space-y-2">
@@ -111,7 +127,7 @@ export const PatientRegisterPage = () => {
 
                     <div className="mt-4 text-center text-sm text-muted-foreground">
                         Already registered?{" "}
-                        <button type="button" className="text-primary hover:underline underline-offset-4 font-medium">
+                        <button type="button" onClick={() => navigate('/login')} className="text-primary hover:underline underline-offset-4 font-medium">
                             Log in
                         </button>
                     </div>

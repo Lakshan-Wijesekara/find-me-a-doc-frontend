@@ -1,40 +1,35 @@
-import { Button } from "@/components/ui/button";
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Marketplace from '@/pages/Marketplace';
 import PatientDashboard from "@/components/PatientDashboard.tsx";
 import './App.css';
 import {LoginPage} from "@/pages/LoginPage.tsx";
 import {DoctorRegisterPage} from "@/pages/DoctorRegisterPage.tsx";
 import {PatientRegisterPage} from "@/pages/PatientRegisterPage.tsx";
+import { ProtectedRoute } from "@/components/ProtectedRoute.tsx";
 
 function App() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50">
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold text-slate-900">
-          FindMeADoc
-        </h1>
-        <p className="text-lg text-slate-600">
-          Patient & Doctor Appointment System
-        </p>
+      <Routes>
+        {/*Default Route*/}
+        <Route path="/" element={<Navigate to="/login" replace />} />
 
-        <Button onClick={() => alert("Booked test!")}>
-          Book an Appointment
-        </Button>
-        <div>
-          < Marketplace />
-        </div>
-        <div>
-          <  PatientDashboard/>
-        </div>
-        <div>
-          <  LoginPage/>
-        </div>
-        <div>
-          <  DoctorRegisterPage/>
-          < PatientRegisterPage />
-        </div>
-      </div>
-    </div>
+        {/* Public Authentication Routes */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register/patient" element={<PatientRegisterPage />} />
+        <Route path="/register/doctor" element={<DoctorRegisterPage />} />
+
+        <Route path="/marketplace" element={
+            <ProtectedRoute>
+                <Marketplace />
+            </ProtectedRoute>
+        } />
+        <Route path="/patient-dashboard" element={
+            <ProtectedRoute>
+                <PatientDashboard />
+            </ProtectedRoute>
+        } />
+
+      </Routes>
   );
 }
 

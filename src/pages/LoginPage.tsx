@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import {loginUser} from "@/services/authService.ts";
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export const LoginPage = () => {
+    const navigate = useNavigate();
+    const { login } = useAuth();
     // Form States
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -27,11 +31,13 @@ export const LoginPage = () => {
             // Call the login API
             const response = await loginUser({ email, password });
 
-            // Store token and user info in localStorage (or context/state management)
-            localStorage.setItem('token', response.token);
-            localStorage.setItem('userEmail', response.email);
-            localStorage.setItem('userRole', response.role);
-            localStorage.setItem("userID", response.userID.toString());
+            login(response.token, response.role, response.userID.toString(), response.email);
+
+            if (response.role === 'DOCTOR') {
+                navigate('/doctor-dashboard');
+            } else {
+                navigate('/patient-dashboard');
+            }
 
             console.log("Login successful:", response);
 
@@ -115,6 +121,26 @@ export const LoginPage = () => {
                     >
                         {isLoading ? 'Signing in...' : 'Sign In'}
                     </button>
+                    <div className="mt-6 flex flex-col items-center gap-3 text-sm text-muted-foreground">
+                        <p>Don't have an account?</p>
+                        <div className="flex gap-4">
+                            <button
+                                type="button"
+                                onClick={() => navigate('/register/patient')}
+                                className="font-medium text-primary underline-offset-4 hover:underline"
+                            >
+                                Sign up as Patient
+                            </button>
+                            <span className="text-border">|</span>
+                            <button
+                                type="button"
+                                onClick={() => navigate('/register/doctor')}
+                                className="font-medium text-primary underline-offset-4 hover:underline"
+                            >
+                                Sign up as Doctor
+                            </button>
+                        </div>
+                    </div>
 
                 </form>
             </div>

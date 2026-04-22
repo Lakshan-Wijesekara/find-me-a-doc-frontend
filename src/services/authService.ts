@@ -36,12 +36,14 @@ export interface PatientRegisterRequest {
     email: string;
     password: string;
     phoneNumber: string;
+    age: number;
 }
 
 export interface PatientRegisterResponse {
     userId: number;
     email: string;
     name: string;
+    age: number;
 }
 
 const AUTH_API_URL = "http://localhost:8080/api/v1/auth";
