@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { getPatientAppointments, type AppointmentDashboardResponse } from "../services/appointmentService";
+import {useNavigate} from "react-router-dom";
 
 function PatientDashboard() {
+    const navigate = useNavigate();
     const [appointments, setAppointments] = useState<AppointmentDashboardResponse[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
@@ -27,11 +29,20 @@ function PatientDashboard() {
 
     return (
         <div className="container mx-auto p-6 md:p-8">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold tracking-tight text-foreground">My Appointments</h1>
-                <p className="text-muted-foreground mt-1">Manage and view your upcoming consultations.</p>
+            {/* 3. Updated Header to include the "Find a Doctor" button */}
+            <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground">My Appointments</h1>
+                    <p className="text-muted-foreground mt-1">Manage and view your upcoming consultations.</p>
+                </div>
+                <button
+                    onClick={() => navigate('/marketplace')}
+                    className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 shadow-sm"
+                >
+                    Find a Doctor
+                </button>
             </div>
-
+            {/* conditional rendering for the appointment if error shows red error message thrown by the API */}
             {error ? (
                 <div className="rounded-md bg-destructive/15 p-4 text-destructive font-medium">
                     {error}
@@ -48,7 +59,6 @@ function PatientDashboard() {
                                     <h3 className="text-lg font-semibold tracking-tight">{apt.doctorName}</h3>
                                     <p className="text-sm text-muted-foreground">{apt.specialization}</p>
                                 </div>
-                                {/* Simple status badge */}
                                 <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-primary/10 text-primary border-primary/20">
                                     {apt.status}
                                 </span>
@@ -68,9 +78,16 @@ function PatientDashboard() {
                     ))}
                 </div>
             ) : (
-                <div className="py-16 text-center border-2 border-dashed border-border rounded-xl bg-card/50">
+                /* for empty state */
+                <div className="py-16 flex flex-col items-center justify-center text-center border-2 border-dashed border-border rounded-xl bg-card/50">
                     <h3 className="text-lg font-medium text-foreground mb-1">No appointments found</h3>
-                    <p className="text-muted-foreground">You haven't booked any consultations yet.</p>
+                    <p className="text-muted-foreground mb-6">You haven't booked any consultations yet.</p>
+                    <button
+                        onClick={() => navigate('/marketplace')}
+                        className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                    >
+                        Browse Marketplace
+                    </button>
                 </div>
             )}
         </div>
