@@ -23,6 +23,14 @@ export interface AppointmentDashboardResponse {
     status: string;
 }
 
+export interface DoctorAppointmentDashboardResponse {
+    appointmentId: string;
+    patientName: string;
+    appointmentDate: string;
+    appointmentTime: string;
+    status: string;
+}
+
 export interface AvailableSlotResponse {
     startTime: string; // Format: "HH:mm:ss"
     endTime: string;   // Format: "HH:mm:ss"
@@ -84,3 +92,11 @@ export const getAvailableSlots = async(doctorId: number, date: string): Promise<
     );
     return response.data;
 }
+
+export const getDoctorAppointments = async (): Promise<DoctorAppointmentDashboardResponse[]> => {
+    const token = localStorage.getItem("token");
+    const response = await axios.get('http://localhost:8080/api/v1/appointments/doctor', {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+};

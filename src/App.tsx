@@ -6,6 +6,7 @@ import {LoginPage} from "@/pages/LoginPage.tsx";
 import {DoctorRegisterPage} from "@/pages/DoctorRegisterPage.tsx";
 import {PatientRegisterPage} from "@/pages/PatientRegisterPage.tsx";
 import { ProtectedRoute } from "@/components/ProtectedRoute.tsx";
+import DoctorDashboard from "@/components/DoctorDashboard.tsx";
 
 function App() {
   return (
@@ -28,6 +29,11 @@ function App() {
                 <PatientDashboard />
             </ProtectedRoute>
         } />
+          <Route path="/doctor-dashboard" element={
+              <ProtectedRoute>
+                  <DoctorDashboard />
+              </ProtectedRoute>
+          } />
 
       </Routes>
   );
