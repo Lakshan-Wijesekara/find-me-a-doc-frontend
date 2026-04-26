@@ -1,37 +1,45 @@
-import {useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import { BookingModal } from "@/components/BookingModel.tsx";
+import { useLocation } from 'react-router-dom';
 
 interface Doctor {
     id: number;
-    name: string; // Match your DTO field names!
+    name: string;
     specialization: string;
     consultationFee: number;
 }
 
 function Marketplace() {
-    // Create a state variable doctor
-    const [doctors, setDoctors] = useState<Doctor[]>([]);
-    const [selectedSpecialty, setSelectedSpecialty] = useState('');
+    // Catch the state passed from the Triage Chat
+    const location = useLocation();
+    const aiState = location.state as { preSelectedSpecialty?: string, doctorBrief?: string } | null;
 
-    // Add state to track the selected doctor for booking
+    const [doctors, setDoctors] = useState<Doctor[]>([]);
     const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
 
-    // Worker hook runs once when the page loads
+    // Initialize filter with AI's recommendation, fallback to empty string for "All doctors"
+    const [selectedSpecialty, setSelectedSpecialty] = useState<string>(
+        aiState?.preSelectedSpecialty || ''
+    );
+
+    // 3. Fetch data from backend whenever the specialty filter changes
     useEffect(() => {
         const baseUrl = "http://localhost:8080/api/v1/doctors";
+        // encodeURIComponent ensures spaces/special characters from AI don't break the URL
         const url = selectedSpecialty
-            ? `${baseUrl}?specialty=${selectedSpecialty}`
+            ? `${baseUrl}?specialty=${encodeURIComponent(selectedSpecialty)}`
             : baseUrl;
 
         fetch(url)
             .then(response => response.json())
-            .then(data => setDoctors(data));
-    }, [selectedSpecialty]); // The dependency array ensures this runs when selectedSpecialty changes
+            .then(data => setDoctors(data))
+            .catch(error => console.error("Error fetching doctors:", error));
+    }, [selectedSpecialty]);
 
-    // The UI return to the screen
     return (
         <div className="container mx-auto p-6 md:p-8">
-            <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            {/* Header Area */}
+            <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight text-foreground">Find a Doctor</h1>
                     <p className="text-muted-foreground mt-1">Book your next consultation easily.</p>
@@ -48,13 +56,45 @@ function Marketplace() {
                         className="flex h-10 w-full md:w-[200px] items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         <option value="">All Specialties</option>
+                        {/* If AI gave a specialty not in this list, adding it dynamically */}
+                        {aiState?.preSelectedSpecialty && (
+                            <option value={aiState.preSelectedSpecialty}>
+                                {aiState.preSelectedSpecialty} (AI Recommended)
+                            </option>
+                        )}
                         <option value="Cardiology">Cardiology</option>
                         <option value="Pediatrics">Pediatrics</option>
                         <option value="Dermatology">Dermatology</option>
-                        <option value="General Medicine">General Medicine</option>
+                        <option value="General Practice">General Practice</option>
                     </select>
                 </div>
             </div>
+
+            {/* AI Recommendation Banner (Only shows if user came from Triage) */}
+            {aiState?.preSelectedSpecialty && (
+                <div className="mb-8 rounded-lg border border-indigo-200 bg-indigo-50 p-5 shadow-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h3 className="text-lg font-semibold text-indigo-900 flex items-center gap-2">
+                                ✨ AI Assessment Attached
+                            </h3>
+                            <p className="text-indigo-800 text-sm mt-1">
+                                We filtered the list for <strong>{aiState.preSelectedSpecialty}</strong> based on your symptoms.
+                                Your doctor will receive the following brief:
+                            </p>
+                            <p className="mt-2 text-sm italic text-indigo-700 border-l-2 border-indigo-300 pl-3">
+                                "{aiState.doctorBrief}"
+                            </p>
+                        </div>
+                        <button
+                            onClick={() => setSelectedSpecialty('')}
+                            className="whitespace-nowrap rounded-md border border-indigo-200 bg-white px-4 py-2 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-100 hover:text-indigo-900"
+                        >
+                            Clear Filter
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Doctor Grid */}
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -89,6 +129,12 @@ function Marketplace() {
                 ) : (
                     <div className="col-span-full py-12 text-center border-2 border-dashed border-border rounded-xl">
                         <p className="text-muted-foreground">No doctors found for this specialty.</p>
+                        <button
+                            onClick={() => setSelectedSpecialty('')}
+                            className="mt-2 text-primary hover:underline text-sm font-medium"
+                        >
+                            View all doctors
+                        </button>
                     </div>
                 )}
             </div>
@@ -98,6 +144,8 @@ function Marketplace() {
                 onClose={() => setSelectedDoctor(null)}
                 doctorId={selectedDoctor?.id || 0}
                 doctorName={`Dr. ${selectedDoctor?.name || ''}`}
+                // Optional: If your BookingModal supports receiving the brief to save to the DB!
+                // aiBrief={aiState?.doctorBrief}
             />
         </div>
     );
