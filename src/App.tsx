@@ -7,12 +7,14 @@ import {DoctorRegisterPage} from "@/pages/DoctorRegisterPage.tsx";
 import {PatientRegisterPage} from "@/pages/PatientRegisterPage.tsx";
 import { ProtectedRoute } from "@/components/ProtectedRoute.tsx";
 import DoctorDashboard from "@/components/DoctorDashboard.tsx";
+import TriageChat from "@/components/TriageChat.tsx";
 
 function App() {
   return (
       <Routes>
         {/*Default Route*/}
         <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/triage" element={<TriageChat/>} />
 
         {/* Public Authentication Routes */}
         <Route path="/login" element={<LoginPage />} />
