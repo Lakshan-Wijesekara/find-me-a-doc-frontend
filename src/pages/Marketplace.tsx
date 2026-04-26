@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BookingModal } from "@/components/BookingModel.tsx";
+import { BookingModal } from "../components/BookingModal.tsx";
 import { useLocation } from 'react-router-dom';
 
 interface Doctor {
@@ -12,7 +12,12 @@ interface Doctor {
 function Marketplace() {
     // Catch the state passed from the Triage Chat
     const location = useLocation();
-    const aiState = location.state as { preSelectedSpecialty?: string, doctorBrief?: string } | null;
+    const aiState = location.state as {
+        preSelectedSpecialty?: string;
+        doctorBrief?: string;
+        urgencyLevel?: string;
+        viralLikelihood?: string;
+    } | null;
 
     const [doctors, setDoctors] = useState<Doctor[]>([]);
     const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
@@ -144,8 +149,7 @@ function Marketplace() {
                 onClose={() => setSelectedDoctor(null)}
                 doctorId={selectedDoctor?.id || 0}
                 doctorName={`Dr. ${selectedDoctor?.name || ''}`}
-                // Optional: If your BookingModal supports receiving the brief to save to the DB!
-                // aiBrief={aiState?.doctorBrief}
+                aiBrief={aiState}
             />
         </div>
     );

@@ -5,6 +5,7 @@ export interface CreateAppointmentRequest {
     doctorId: number;
     appointmentDate: string; // Format: "YYYY-MM-DD"
     appointmentTime: string; // Format: "HH:mm:ss"
+    aiBrief: any;
 }
 
 export interface CreateAppointmentResponse {

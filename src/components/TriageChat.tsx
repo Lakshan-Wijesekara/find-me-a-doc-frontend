@@ -142,7 +142,7 @@ const TriageChat: React.FC = () => {
                         <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
                             <button
                                 onClick={() => navigate('/marketplace', {
-                                    state: { preSelectedSpecialty: triageResult.recommendedSpecialist, doctorBrief: triageResult.doctorBrief }
+                                    state: { ...triageResult, preSelectedSpecialty: triageResult.recommendedSpecialist }
                                 })}
                                 style={{ flex: 1, padding: '10px 16px', borderRadius: '6px', border: 'none', backgroundColor: '#38a169', color: 'white', cursor: 'pointer', fontWeight: 'bold' }}
                             >
