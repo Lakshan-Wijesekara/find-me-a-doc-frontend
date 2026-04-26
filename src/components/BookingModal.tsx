@@ -8,10 +8,11 @@ interface BookingModalProps {
     onClose: () => void;
     doctorId: number;
     doctorName: string;
+    aiBrief: any;
 }
 
 export const BookingModal: React.FC<BookingModalProps> = ({
-    isOpen, onClose, doctorId, doctorName
+    isOpen, onClose, doctorId, doctorName, aiBrief
 }) => {
     // Input state: date state
     const [date, setDate] = useState<Date | undefined>(undefined);
@@ -81,6 +82,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                     doctorId: doctorId,
                     appointmentDate: formatDate,
                     appointmentTime: time + ":00",
+                    aiBrief: aiBrief || null
                 });
 
                 setStatus('success');
