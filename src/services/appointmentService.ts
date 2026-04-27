@@ -108,3 +108,16 @@ export const getDoctorAppointments = async (): Promise<DoctorAppointmentDashboar
     });
     return response.data;
 };
+
+export const cancelDoctorAppointment = async (appointmentId: number | string) => {
+    const token = localStorage.getItem("token"); // 1. Get the token
+
+    const response = await axios.patch(`http://localhost:8080/api/v1/appointments/${appointmentId}/cancel`,
+        null, // No request body needed
+        {
+            headers: { Authorization: `Bearer ${token}` }
+        }
+    );
+
+    return response.data;
+};

@@ -1,29 +1,89 @@
 import { useState, useEffect } from "react";
-import { getPatientAppointments, type AppointmentDashboardResponse } from "../services/appointmentService";
+import {
+    getPatientAppointments,
+    type AppointmentDashboardResponse,
+} from "../services/appointmentService";
 import {useNavigate} from "react-router-dom";
 import {useAuth} from "@/context/AuthContext.tsx";
+import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
+import {getPatientProfile, type PatientProfile} from "@/services/patientService.ts";
 
 function PatientDashboard() {
     const { logout } = useAuth();
+    const [profile, setProfile] = useState<PatientProfile | null>(null);
     const navigate = useNavigate();
     const [appointments, setAppointments] = useState<AppointmentDashboardResponse[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
+    const [cancellationAlert, setCancellationAlert] = useState<{message: string, status: string} | null>(null);
+
+    const fetchAppointments = async () => {
+        try {
+            const data = await getPatientAppointments();
+            setAppointments(data);
+        } catch (err: any) {
+            setError("Failed to load appointments. Please ensure you are logged in.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const fetchProfile = async () => {
+        try {
+            const data = await getPatientProfile();
+            setProfile(data);
+        } catch (error) {
+            console.error("Failed to load patient profile", error);
+        }
+    };
 
     useEffect(() => {
-        const fetchAppointments = async () => {
-            try {
-                const data = await getPatientAppointments();
-                setAppointments(data);
-            } catch (err: any) {
-                setError("Failed to load appointments. Please ensure you are logged in.");
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
+        fetchProfile();
         fetchAppointments();
     }, []);
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        const patientId = profile?.id;
+
+        if (!token || !patientId) return;
+
+        const stompClient = new Client({
+            webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+            connectHeaders: { Authorization: `Bearer ${token}` },
+            onConnect: () => {
+                console.log('🔌 Patient WebSocket Connected');
+
+                // Listen to the specific patient channel
+                stompClient.subscribe(`/topic/patient/${patientId}`, (message) => {
+                    const payload = JSON.parse(message.body);
+                    console.log("📩 UPDATE RECEIVED:", payload);
+
+                    // 1. Show the alert
+                    setCancellationAlert({
+                        message: payload.message,
+                        status: payload.newStatus
+                    });
+
+                    // Refresh the UI so the appointment turns red instantly
+                    fetchAppointments();
+
+                    // Auto-hide the toast after 8 seconds (giving them time to read)
+                    setTimeout(() => {
+                        setCancellationAlert(null);
+                    }, 8000);
+                });
+            },
+            onStompError: (frame) => console.error('STOMP Error', frame)
+        });
+
+        stompClient.activate();
+
+        return () => {
+            if (stompClient.active) stompClient.deactivate();
+        };
+    }, [profile?.id]);
 
     if (isLoading) {
         return <div className="p-8 text-center text-muted-foreground">Loading your appointments...</div>;
@@ -126,6 +186,33 @@ function PatientDashboard() {
     </span>
                 </button>
             </div>
+            {/* --- Real-time Cancellation Alert --- */}
+            {cancellationAlert && (
+                <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-bottom-10 duration-300">
+                    <div className="flex w-80 items-center gap-4 rounded-lg border border-destructive/30 bg-destructive/10 p-4 shadow-2xl ring-1 ring-black/5 backdrop-blur-sm">
+                        {/* Warning Icon */}
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-destructive text-destructive-foreground text-xl">
+                            ⚠️
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1">
+                            <p className="text-sm font-bold text-destructive">Appointment Update</p>
+                            <p className="text-xs text-foreground mt-1 leading-tight font-medium">
+                                {cancellationAlert.message}
+                            </p>
+                        </div>
+
+                        {/* Close Button */}
+                        <button
+                            onClick={() => setCancellationAlert(null)}
+                            className="text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                            <span className="text-lg">×</span>
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
