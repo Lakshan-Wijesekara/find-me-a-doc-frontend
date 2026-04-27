@@ -24,12 +24,19 @@ export interface AppointmentDashboardResponse {
     status: string;
 }
 
+export interface AIBrief {
+    urgencyLevel?: string;
+    viralLikelihood?: string;
+    doctorBrief?: string;
+}
+
 export interface DoctorAppointmentDashboardResponse {
     appointmentId: string;
     patientName: string;
     appointmentDate: string;
     appointmentTime: string;
     status: string;
+    aiBrief: AIBrief;
 }
 
 export interface AvailableSlotResponse {
