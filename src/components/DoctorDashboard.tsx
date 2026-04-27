@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 import { getMyProfile, updateMyProfile, type DoctorProfile } from '../services/doctorService';
 import { getDoctorAppointments, type DoctorAppointmentDashboardResponse } from '../services/appointmentService';
 
@@ -32,6 +34,7 @@ export default function DoctorDashboard() {
 
     const [profile, setProfile] = useState<DoctorProfile | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [newBookingToast, setNewBookingToast] = useState<{name: string, message: string} | null>(null);
 
     const [isEditing, setIsEditing] = useState(false);
     const [editForm, setEditForm] = useState<Partial<DoctorProfile>>({});
@@ -67,6 +70,39 @@ export default function DoctorDashboard() {
         fetchProfile();
         fetchAppointments();
     }, []);
+
+    // 2. WebSocket Logic
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        const doctorId = profile?.id;
+
+        if (!token || !doctorId) return;
+
+        const stompClient = new Client({
+            webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+            connectHeaders: { Authorization: `Bearer ${token}` },
+            onConnect: () => {
+                console.log('🔌 Connected to WebSocket');
+                stompClient.subscribe(`/topic/doctor/${doctorId}`, (message) => {
+                    const payload = JSON.parse(message.body);
+
+                    // Alert the doctor
+                    setNewBookingToast({ name: payload.patientName, message: payload.message });
+                    // Refresh the list to get the full object with AI Brief, this runs eachtime a message returns
+                    fetchAppointments();
+
+                    setTimeout(() => setNewBookingToast(null), 5000);
+                });
+            },
+            onStompError: (frame) => console.error('STOMP Error', frame)
+        });
+
+        stompClient.activate();
+
+        return () => {
+            if (stompClient.active) stompClient.deactivate();
+        };
+    }, [profile?.id]);
 
     const handleSaveProfile = async (e: React.SyntheticEvent) => {
         e.preventDefault();
@@ -226,6 +262,33 @@ export default function DoctorDashboard() {
                     </div>
                 </div>
             </div>
+            {/* --- Real-time Notification Toast --- */}
+            {newBookingToast && (
+                <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-bottom-10 duration-300">
+                    <div className="flex w-80 items-center gap-4 rounded-lg border border-primary/20 bg-card p-4 shadow-2xl ring-1 ring-black/5">
+                        {/* Icon/Avatar */}
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-xl">
+                            ✨
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1">
+                            <p className="text-sm font-bold text-foreground">New Appointment!</p>
+                            <p className="text-xs text-muted-foreground leading-tight">
+                                {newBookingToast.name} has just booked a slot.
+                            </p>
+                        </div>
+
+                        {/* Close Button */}
+                        <button
+                            onClick={() => setNewBookingToast(null)}
+                            className="text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                            <span className="text-lg">×</span>
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
