@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { getPatientAppointments, type AppointmentDashboardResponse } from "../services/appointmentService";
 import {useNavigate} from "react-router-dom";
+import {useAuth} from "@/context/AuthContext.tsx";
 
 function PatientDashboard() {
+    const { logout } = useAuth();
     const navigate = useNavigate();
     const [appointments, setAppointments] = useState<AppointmentDashboardResponse[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -42,7 +44,14 @@ function PatientDashboard() {
                     >
                         Find a Doctor
                     </button>
+                    <button
+                        onClick={logout}
+                        className="rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground hover:bg-secondary/80 transition-colors"
+                    >
+                        Log Out
+                    </button>
                 </div>
+
             </div>
             {/* conditional rendering for the appointment if error shows red error message thrown by the API */}
             {error ? (
