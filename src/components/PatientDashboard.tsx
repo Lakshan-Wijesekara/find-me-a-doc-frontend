@@ -8,6 +8,7 @@ import {useAuth} from "@/context/AuthContext.tsx";
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import {getPatientProfile, type PatientProfile} from "@/services/patientService.ts";
+import AppHelpWidget from "@/components/AppHelpWidget.tsx";
 
 function PatientDashboard() {
     const { logout } = useAuth();
@@ -213,6 +214,7 @@ function PatientDashboard() {
                     </div>
                 </div>
             )}
+            <AppHelpWidget/>
         </div>
     );
 }
