@@ -29,15 +29,14 @@ test.describe('Patient Appointment Booking Flows', () => {
         await expect(timeSlotButton).toBeVisible({ timeout: 10000 });
         await timeSlotButton.click();
 
-        // 3. Initiate Checkout (NEW UI)
+        // 3. Initiate Checkout
         await page.getByRole('button', { name: 'Proceed to Checkout' }).click();
 
-        // 4. Handle Mock Payment Gateway (NEW UI)
+        // 4. Handle Mock Payment Gateway
         await expect(page.getByRole('heading', { name: 'Secure Checkout' })).toBeVisible();
         await page.getByRole('button', { name: 'Pay Now' }).click();
 
         // 5. Verify Success
-        // Increased timeout to 15s because the mock payment takes ~4 seconds to simulate
         await expect(page.getByText('🎉 Appointment successfully booked!')).toBeVisible({ timeout: 15000 });
     });
 
@@ -96,7 +95,6 @@ test.describe('Patient Appointment Booking Flows', () => {
         await page.getByRole('button', { name: 'Pay Now' }).click();
 
         // 10. Verify Success
-        // Increased timeout to account for the payment simulation delay
         await expect(page.getByText('🎉 Appointment successfully booked!')).toBeVisible({ timeout: 15000 });
     });
     });
