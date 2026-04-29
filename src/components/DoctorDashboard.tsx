@@ -24,7 +24,7 @@ const getUrgencyColor = (urgency?: string) => {
 };
 
 const ALLOWED_SPECIALIZATIONS = [
-    'General Practice',
+    'General Medicine',
     'Cardiology',
     'Dermatology',
     'Neurology',
@@ -39,6 +39,7 @@ export default function DoctorDashboard() {
     const [profile, setProfile] = useState<DoctorProfile | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [newBookingToast, setNewBookingToast] = useState<{name: string, message: string} | null>(null);
+    const [isCancelling, setIsCancelling] = useState(false);
 
     const [isEditing, setIsEditing] = useState(false);
     const [editForm, setEditForm] = useState<Partial<DoctorProfile>>({});
@@ -71,14 +72,16 @@ export default function DoctorDashboard() {
         }
     };
 
-        // Ask for confirmation, opens the pop-up
+    // Ask for confirmation, opens the pop-up
     const handleCancelClick = (appointmentId: number | string) => {
         setAppointmentToCancel(appointmentId);
     };
 
-// 2. Actually fires the API call when they click "Yes"
+    // Fires the API call when they click "Yes"
     const confirmCancellation = async () => {
         if (!appointmentToCancel) return;
+
+        setIsCancelling(true);
 
         try {
             await cancelDoctorAppointment(appointmentToCancel);
@@ -87,6 +90,7 @@ export default function DoctorDashboard() {
             console.error("Failed to cancel appointment:", error);
             alert("Failed to cancel the appointment. Please try again.");
         } finally {
+            setIsCancelling(false);
             setAppointmentToCancel(null); // Close the modal
         }
     };
@@ -318,15 +322,17 @@ export default function DoctorDashboard() {
                                 <div className="mt-6 flex justify-end gap-3">
                                     <button
                                         onClick={() => setAppointmentToCancel(null)}
-                                        className="rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent transition-colors"
+                                        disabled={isCancelling}
+                                        className="rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         No, Keep it
                                     </button>
                                     <button
                                         onClick={confirmCancellation}
-                                        className="rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:bg-destructive/90 transition-colors"
+                                        disabled={isCancelling}
+                                        className="rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:bg-destructive/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        Yes, Cancel
+                                        {isCancelling ? 'Cancelling...' : 'Yes, Cancel'}
                                     </button>
                                 </div>
                             </div>
