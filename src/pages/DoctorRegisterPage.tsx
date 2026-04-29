@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { registerDoctor } from '@/services/authService';
+import {useNavigate} from "react-router-dom";
 
 export const DoctorRegisterPage = () => {
-    // 1. Updated Form States matching your Java Record
+    const navigate = useNavigate();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -10,7 +11,7 @@ export const DoctorRegisterPage = () => {
     const [consultationFee, setConsultationFee] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
 
-    // 2. UI Status States
+    // UI Status States
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
@@ -69,7 +70,7 @@ export const DoctorRegisterPage = () => {
                         </svg>
                     </div>
                     <span className="text-xl font-bold tracking-tight text-foreground">
-                        findmeadoc
+                        FindMeADoc
                     </span>
                 </div>
 
@@ -132,7 +133,7 @@ export const DoctorRegisterPage = () => {
 
                     <div className="mt-4 text-center text-sm text-muted-foreground">
                         Already registered?{" "}
-                        <button type="button" className="text-primary hover:underline underline-offset-4 font-medium">
+                        <button type="button" onClick={() => navigate('/login')} className="text-primary hover:underline underline-offset-4 font-medium">
                             Log in
                         </button>
                     </div>

@@ -68,7 +68,7 @@ export const PatientRegisterPage = () => {
                         </svg>
                     </div>
                     <span className="text-xl font-bold tracking-tight text-foreground">
-                        findmeadoc
+                        FindMeADoc
                     </span>
                 </div>
 

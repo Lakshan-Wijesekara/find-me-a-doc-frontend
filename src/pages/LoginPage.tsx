@@ -72,7 +72,7 @@ export const LoginPage = () => {
                         </svg>
                     </div>
                     <span className="text-xl font-bold tracking-tight text-foreground">
-                        Find Me A Doc
+                        FindMeADoc
                     </span>
                 </div>
 
