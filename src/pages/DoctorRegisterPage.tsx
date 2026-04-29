@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { registerDoctor } from '@/services/authService';
 import {useNavigate} from "react-router-dom";
+import { useTranslation } from 'react-i18next';
+
 
 export const DoctorRegisterPage = () => {
     const navigate = useNavigate();
@@ -15,6 +17,13 @@ export const DoctorRegisterPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+
+    //Translations
+    const { t, i18n } = useTranslation();
+
+    const changeLanguage = (lng: string) => {
+        i18n.changeLanguage(lng);
+    };
 
     const handleRegister = async (e: React.SyntheticEvent) => {
         e.preventDefault();
@@ -59,7 +68,30 @@ export const DoctorRegisterPage = () => {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4 py-10">
+        <div className="relative flex min-h-screen items-center justify-center bg-muted/30 p-4 py-10">
+
+            {/* --- Localization Switcher --- */}
+            <div className="absolute top-6 right-6 flex gap-2">
+                <button
+                    onClick={() => changeLanguage('en')}
+                    className={`h-8 px-3 text-xs font-medium rounded-md border transition-colors ${i18n.language === 'en' ? 'bg-primary text-primary-foreground border-primary' : 'bg-background text-foreground border-input hover:bg-accent'}`}
+                >
+                    EN
+                </button>
+                <button
+                    onClick={() => changeLanguage('si')}
+                    className={`h-8 px-3 text-xs font-medium rounded-md border transition-colors ${i18n.language === 'si' ? 'bg-primary text-primary-foreground border-primary' : 'bg-background text-foreground border-input hover:bg-accent'}`}
+                >
+                    සිංහල
+                </button>
+                <button
+                    onClick={() => changeLanguage('ta')}
+                    className={`h-8 px-3 text-xs font-medium rounded-md border transition-colors ${i18n.language === 'ta' ? 'bg-primary text-primary-foreground border-primary' : 'bg-background text-foreground border-input hover:bg-accent'}`}
+                >
+                    தமிழ்
+                </button>
+            </div>
+
             <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
 
                 {/* LOGO SECTION */}
@@ -75,9 +107,9 @@ export const DoctorRegisterPage = () => {
                 </div>
 
                 <div className="mb-6 flex flex-col space-y-1.5 text-center">
-                    <h2 className="text-2xl font-semibold tracking-tight">Doctor Registration</h2>
+                    <h2 className="text-2xl font-semibold tracking-tight">{t('doc_reg_title')}</h2>
                     <p className="text-sm text-muted-foreground">
-                        Join our platform to start receiving patients
+                        {t('doc_reg_subtitle')}
                     </p>
                 </div>
 
@@ -96,49 +128,49 @@ export const DoctorRegisterPage = () => {
                     )}
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">Full Name</label>
-                        <input type="text" required value={name} onChange={(e) => setName(e.target.value)} placeholder="Dr. John Doe" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" />
+                        <label className="text-sm font-medium text-foreground">{t('full_name')}</label>
+                        <input type="text" required value={name} onChange={(e) => setName(e.target.value)} placeholder={t('doc_name_placeholder')} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" />
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">Email</label>
+                        <label className="text-sm font-medium text-foreground">{t('email')}</label>
                         <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="doctor@example.com" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-foreground">Specialization</label>
-                            <input type="text" required value={specialization} onChange={(e) => setSpecialization(e.target.value)} placeholder="Cardiology" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" />
+                            <label className="text-sm font-medium text-foreground">{t('specialization')}</label>
+                            <input type="text" required value={specialization} onChange={(e) => setSpecialization(e.target.value)} placeholder={t('doc_specialty_placeholder')} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" />
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-foreground">Fee ($)</label>
+                            <label className="text-sm font-medium text-foreground">{t('fee')}</label>
                             <input type="number" required min="0" step="0.01" value={consultationFee} onChange={(e) => setConsultationFee(e.target.value)} placeholder="150.00" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" />
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">Phone Number</label>
+                        <label className="text-sm font-medium text-foreground">{t('phone_number')}</label>
                         <input type="tel" required value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} placeholder="+1 234 567 890" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" />
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">Password</label>
+                        <label className="text-sm font-medium text-foreground">{t('password')}</label>
                         <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" />
                     </div>
 
                     <button type="submit" disabled={isLoading} className="mt-2 inline-flex h-10 w-full items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50">
-                        {isLoading ? 'Creating account...' : 'Register as Doctor'}
+                        {isLoading ? t('creating_account') : t('register_doc_btn')}
                     </button>
 
                     <div className="mt-4 text-center text-sm text-muted-foreground">
-                        Already registered?{" "}
+                        {t('already_registered')}{" "}
                         <button type="button" onClick={() => navigate('/login')} className="text-primary hover:underline underline-offset-4 font-medium">
-                            Log in
+                            {t('log_in_link')}
                         </button>
                     </div>
                 </form>
             </div>
         </div>
     );
-};
+}
