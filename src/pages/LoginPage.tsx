@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {loginUser} from "@/services/authService.ts";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 export const LoginPage = () => {
     const navigate = useNavigate();
@@ -13,6 +14,13 @@ export const LoginPage = () => {
     // UI Status States
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+
+    //Translations
+    const { t, i18n } = useTranslation();
+
+    const changeLanguage = (lng: string) => {
+        i18n.changeLanguage(lng);
+    };
 
     // Form Submission Handler
     const handleLogin = async (e: React.SyntheticEvent) => {
@@ -53,21 +61,35 @@ export const LoginPage = () => {
 
     // 4. The UI
     return (
-        <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
+        <div className="relative min-h-screen flex items-center justify-center bg-muted/30 p-4">
+
+            {/* --- Language Switch --- */}
+            <div className="absolute top-6 right-6 flex gap-2">
+                <button
+                    onClick={() => changeLanguage('en')}
+                    className={`h-8 px-3 text-xs font-medium rounded-md border transition-colors ${i18n.language === 'en' ? 'bg-primary text-primary-foreground border-primary' : 'bg-background text-foreground border-input hover:bg-accent'}`}
+                >
+                    EN
+                </button>
+                <button
+                    onClick={() => changeLanguage('si')}
+                    className={`h-8 px-3 text-xs font-medium rounded-md border transition-colors ${i18n.language === 'si' ? 'bg-primary text-primary-foreground border-primary' : 'bg-background text-foreground border-input hover:bg-accent'}`}
+                >
+                    සිංහල
+                </button>
+                <button
+                    onClick={() => changeLanguage('ta')}
+                    className={`h-8 px-3 text-xs font-medium rounded-md border transition-colors ${i18n.language === 'ta' ? 'bg-primary text-primary-foreground border-primary' : 'bg-background text-foreground border-input hover:bg-accent'}`}
+                >
+                    தமிழ்
+                </button>
+            </div>
+
             <div className="w-full max-w-sm rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
 
                 <div className="mb-6 flex flex-col items-center justify-center gap-2">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary shadow-sm">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="h-6 w-6 text-primary-foreground"
-                        >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-primary-foreground">
                             <path d="M12 2v20M2 12h20" />
                         </svg>
                     </div>
@@ -77,9 +99,9 @@ export const LoginPage = () => {
                 </div>
 
                 <div className="flex flex-col space-y-1.5 text-center mb-6">
-                    <h2 className="text-2xl font-semibold tracking-tight">Welcome back</h2>
+                    <h2 className="text-2xl font-semibold tracking-tight">{t('welcome')}</h2>
                     <p className="text-sm text-muted-foreground">
-                        Enter your credentials to access your account
+                        {t('subtitle')}
                     </p>
                 </div>
 
@@ -92,7 +114,7 @@ export const LoginPage = () => {
                     )}
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">Email</label>
+                        <label className="text-sm font-medium text-foreground">{t('email')}</label>
                         <input
                             type="email"
                             required
@@ -104,7 +126,7 @@ export const LoginPage = () => {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">Password</label>
+                        <label className="text-sm font-medium text-foreground">{t('password')}</label>
                         <input
                             type="password"
                             required
@@ -119,17 +141,18 @@ export const LoginPage = () => {
                         disabled={isLoading}
                         className="mt-2 inline-flex h-10 w-full items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
                     >
-                        {isLoading ? 'Signing in...' : 'Sign In'}
+                        {isLoading ? t('signing_in') : t('sign_in')}
                     </button>
+
                     <div className="mt-6 flex flex-col items-center gap-3 text-sm text-muted-foreground">
-                        <p>Don't have an account?</p>
+                        <p>{t('no_account')}</p>
                         <div className="flex gap-4">
                             <button
                                 type="button"
                                 onClick={() => navigate('/register/patient')}
                                 className="font-medium text-primary underline-offset-4 hover:underline"
                             >
-                                Sign up as Patient
+                                {t('signup_patient')}
                             </button>
                             <span className="text-border">|</span>
                             <button
@@ -137,7 +160,7 @@ export const LoginPage = () => {
                                 onClick={() => navigate('/register/doctor')}
                                 className="font-medium text-primary underline-offset-4 hover:underline"
                             >
-                                Sign up as Doctor
+                                {t('signup_doctor')}
                             </button>
                         </div>
                     </div>
@@ -146,4 +169,4 @@ export const LoginPage = () => {
             </div>
         </div>
     );
-};
+}
