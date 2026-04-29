@@ -13,8 +13,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('Patient Appointment Booking Flows', () => {
-
-    // --- FLOW 1: Standard Booking ---
+// --- FLOW 1: Standard Booking ---
     test('Standard Flow: Should book an appointment directly from the marketplace', async ({ page }) => {
         await page.getByRole('button', { name: 'Find a Doctor' }).click();
         await expect(page.getByRole('heading', { name: 'Find a Doctor' })).toBeVisible();
@@ -30,20 +29,23 @@ test.describe('Patient Appointment Booking Flows', () => {
         await expect(timeSlotButton).toBeVisible({ timeout: 10000 });
         await timeSlotButton.click();
 
-        // 3. Confirm Booking
-        await page.getByRole('button', { name: 'Confirm' }).click();
+        // 3. Initiate Checkout (NEW UI)
+        await page.getByRole('button', { name: 'Proceed to Checkout' }).click();
 
-        // 4. Verify Success
-        await expect(page.getByText('🎉 Appointment successfully booked!')).toBeVisible({ timeout: 10000 });
+        // 4. Handle Mock Payment Gateway (NEW UI)
+        await expect(page.getByRole('heading', { name: 'Secure Checkout' })).toBeVisible();
+        await page.getByRole('button', { name: 'Pay Now' }).click();
+
+        // 5. Verify Success
+        // Increased timeout to 15s because the mock payment takes ~4 seconds to simulate
+        await expect(page.getByText('🎉 Appointment successfully booked!')).toBeVisible({ timeout: 15000 });
     });
 
-    // --- FLOW 2: AI Triage Booking ---
+// --- FLOW 2: AI Triage Booking ---
     test('AI Triage Flow: Should recommend a doctor and show the AI banner', async ({ page }) => {
 
-        // --- NEW: Intercept the AI Backend Call ---
-        // This catches the exact URL TriageChat.tsx is calling
+        // --- Intercept the AI Backend Call ---
         await page.route('**/api/v1/triage/diagnose', async (route) => {
-            // Return the exact JSON structure based on your screenshot instantly
             await route.fulfill({
                 status: 200,
                 contentType: 'application/json',
@@ -57,6 +59,7 @@ test.describe('Patient Appointment Booking Flows', () => {
                 })
             });
         });
+
         // 1. Navigate to AI Triage Service
         await page.getByRole('button', { name: 'Symptom Analyzer' }).click();
         await expect(page.getByRole('heading', { name: 'Medical Triage Chat' })).toBeVisible();
@@ -85,10 +88,15 @@ test.describe('Patient Appointment Booking Flows', () => {
         await expect(timeSlotButton).toBeVisible({ timeout: 10000 });
         await timeSlotButton.click();
 
-        // 8. Confirm Booking
-        await page.getByRole('button', { name: 'Confirm' }).click();
+        // 8. Initiate Checkout (NEW UI)
+        await page.getByRole('button', { name: 'Proceed to Checkout' }).click();
 
-        // 9. Verify Success
-        await expect(page.getByText('🎉 Appointment successfully booked!')).toBeVisible({ timeout: 10000 });
-    })
+        // 9. Handle Mock Payment Gateway (NEW UI)
+        await expect(page.getByRole('heading', { name: 'Secure Checkout' })).toBeVisible();
+        await page.getByRole('button', { name: 'Pay Now' }).click();
+
+        // 10. Verify Success
+        // Increased timeout to account for the payment simulation delay
+        await expect(page.getByText('🎉 Appointment successfully booked!')).toBeVisible({ timeout: 15000 });
+    });
     });
